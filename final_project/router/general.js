@@ -1,5 +1,7 @@
 const express = require('express');
 let books = require("./booksdb.js");
+const axios = require('axios');
+
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
@@ -27,18 +29,19 @@ public_users.post("/register", (req,res) => {
 });
 
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
-  //Write your code here
+public_users.get('/',async function (req, res) {
+  
   // Send JSON response with formatted friends data
-  res.send(JSON.stringify(books, null, 4))
+  let allbooks = await books;
+  res.send(JSON.stringify(allbooks, null, 4))
   return res.status(300).json({message: "Yet to be implemented"});
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
+public_users.get('/isbn/:isbn',async function (req, res) {
   //Write your code here
   let isbn = req.params.isbn;
-  let isbn_book = books[isbn];
+  let isbn_book = await books[isbn];
   if (isbn_book) {
     res.send(isbn_book);
   } else {
@@ -48,10 +51,10 @@ public_users.get('/isbn/:isbn',function (req, res) {
  });
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
+public_users.get('/author/:author',async function (req, res) {
   //Write your code here
   let author = req.params.author;
-  const filteredBooks = Object.fromEntries(
+  const filteredBooks = await Object.fromEntries(
     Object.entries(books).filter(([key, value]) => value.author === author)
   );
   if (filteredBooks) {
@@ -64,10 +67,10 @@ public_users.get('/author/:author',function (req, res) {
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
+public_users.get('/title/:title',async function (req, res) {
   //Write your code here
   let title = req.params.title;
-  const filteredBooks = Object.fromEntries(
+  const filteredBooks = await Object.fromEntries(
     Object.entries(books).filter(([key, value]) => value.title === title)
   );
   if (filteredBooks) {
